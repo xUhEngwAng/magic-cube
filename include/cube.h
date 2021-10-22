@@ -63,8 +63,12 @@ public:
         if(first_draw) initDrawing();
         glBindVertexArray(VAO);
 
+        FaceTexture currTex;
+
         for(int ix = 0; ix != 6; ++ix){
-			glBindTexture(GL_TEXTURE_2D, textures[face_textures[ix]]);
+            currTex = face_textures[ix];
+            if(currTex > FACE_TEXTURE_3) currTex = FACE_TEXTURE_0;
+			glBindTexture(GL_TEXTURE_2D, textures[currTex]);
 			glDrawArrays(GL_TRIANGLES, ix * 6, 6);
 		}
 
