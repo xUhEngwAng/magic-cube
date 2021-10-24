@@ -1,15 +1,26 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "shader.h"
+#include "magic_cube.h"
+#include "cube.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
+void loadTextures(GLuint n, const std::string* paths, GLuint* textures);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+const unsigned int NUM_TEXTURES = 4;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -38,21 +49,28 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-	// configure vao & vbo
-	// -------------------
-	GLfloat vertices[] = {0, 0.5f, 0, -0.5f, -0.5f, 0, 0.5f, -0.5f, 0};
-	GLuint VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(0);
+	// load and configure cube
+	Cube cube(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_3);
 	// load shader programs
+	// --------------------
 	Shader shader("./shader/vertex.glsl", "./shader/fragment.glsl");
 	shader.Use();
+	// configure MVP matrices
+	// ----------------------
+	glm::mat4 model(1.0f), view(1.0f), perspective(1.0f);
+	model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0, 1.0f, 0));
+	view = glm::lookAt(glm::vec3(0, 1.0f, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));
+	perspective = glm::perspective(glm::radians(45.0f), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 100.0f);
+	shader.setMat4("model", model);
+	shader.setMat4("view", view);
+	shader.setMat4("perspective", perspective);
+	// load textures
+	// -------------
+	GLuint* textures = new GLuint[NUM_TEXTURES];
+	std::string texPaths[NUM_TEXTURES] = {"./images/black.png", "./images/green.png", "./images/orange.png", "./images/skyblue.png"};
+	loadTextures(NUM_TEXTURES, texPaths, textures);
+	// --------------
+	glEnable(GL_DEPTH_TEST);
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
@@ -64,9 +82,9 @@ int main()
 		// render
 		// ------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		cube.draw(textures);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -75,8 +93,7 @@ int main()
 	}
 	// glfw: terminate, clearing all previously allocated GLFWresources.
 	//---------------------------------------------------------------
-	glDeleteBuffers(1, &VBO);
-	glDeleteVertexArrays(1, &VAO);
+	cube.finishDrawing();
 	glfwTerminate();
 	return 0;
 }
@@ -94,4 +111,35 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+}
+
+/*
+ * Load Texture images in batch mode.
+ * Note that the images should be in .png format.
+ * 
+ * @param n: # textures to be loaded
+ * @param paths: corresponding texture paths
+ * @param textures: pre-allocated array to hold the resulting texture handlers
+ */
+void loadTextures(GLuint n, const std::string* paths, GLuint* textures){
+	for(int ix = 0; ix != n; ++ix){
+		glGenTextures(1, textures + ix);
+		// glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[ix]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		int width, height, nrchannels;
+		unsigned char *data = stbi_load(paths[ix].c_str(), &width, &height, &nrchannels, 0);
+		if(!data){
+			std::cerr << "Failed to load texture image " << paths[ix] << std::endl;
+		}
+		else{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		stbi_image_free(data);
+	}
 }
