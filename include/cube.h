@@ -67,11 +67,11 @@ public:
 
         for(int ix = 0; ix != 6; ++ix){
             currTex = face_textures[ix];
-            if(currTex > FACE_TEXTURE_3) currTex = FACE_TEXTURE_0;
 			glBindTexture(GL_TEXTURE_2D, textures[currTex]);
 			glDrawArrays(GL_TRIANGLES, ix * 6, 6);
 		}
 
+        // Unbind VAO for further drawing
         glBindVertexArray(0);
     }
 

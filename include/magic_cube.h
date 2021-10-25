@@ -20,17 +20,17 @@ public:
         /* Initilize face textures of each cube */
         // ---------------------------------------
         // First layer, front row
-        cubes[0].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_2);
-        cubes[1].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_2);
-        cubes[2].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_2);
+        cubes[0].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
+        cubes[1].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
+        cubes[2].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_6);
         // First layer, middle row
-        cubes[3].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_2);
-        cubes[4].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_2);
-        cubes[5].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_2);
+        cubes[3].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
+        cubes[4].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
+        cubes[5].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_6);
         // First layer, last row
-        cubes[6].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_2);
-        cubes[7].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_2);
-        cubes[8].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_2);
+        cubes[6].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
+        cubes[7].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
+        cubes[8].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_6);
 
         // Second layer, front row
         cubes[9].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
@@ -61,7 +61,7 @@ public:
         /* Initialize model matrices for each cube*/
         for(int ix = 0; ix != 27; ++ix){
             model_matrices[ix] = glm::translate(glm::mat4(1.0f), cubePositions[ix]);
-            model_matrices[ix] = glm::scale(model_matrices[ix], glm::vec3(0.5f, 0.5f, 0.5f));
+            model_matrices[ix] = glm::scale(model_matrices[ix], glm::vec3(0.3f, 0.3f, 0.3f));
         }
     }
 
@@ -144,19 +144,19 @@ private:
     Cube cubes[27];
     glm::vec3 cubePositions[27] = {
         // First Layer
-        glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), //front row
-        glm::vec3(-0.5f, 0.5f, 0), glm::vec3(0, 0.5f, 0), glm::vec3(0.5f, 0.5f, 0), // middle row
-        glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0, 0.5f, -0.5f), glm::vec3(0.5f, 0.5f, -0.5f), // last row
+        glm::vec3(-0.3f, 0.3f, 0.3f), glm::vec3(0, 0.3f, 0.3f), glm::vec3(0.3f, 0.3f, 0.3f), //front row
+        glm::vec3(-0.3f, 0.3f, 0), glm::vec3(0, 0.3f, 0), glm::vec3(0.3f, 0.3f, 0), // middle row
+        glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), // last row
     
         // Second layer
-        glm::vec3(-0.5f, 0, 0.5f), glm::vec3(0, 0, 0.5f), glm::vec3(0.5f, 0, 0.5f), //front row
-        glm::vec3(-0.5f, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0.5f, 0, 0), // middle row
-        glm::vec3(-0.5f, 0, -0.5f), glm::vec3(0, 0, -0.5f), glm::vec3(0.5f, 0, -0.5f), // last row
+        glm::vec3(-0.3f, 0, 0.3f), glm::vec3(0, 0, 0.3f), glm::vec3(0.3f, 0, 0.3f), //front row
+        glm::vec3(-0.3f, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0.3f, 0, 0), // middle row
+        glm::vec3(-0.3f, 0, -0.3f), glm::vec3(0, 0, -0.3f), glm::vec3(0.3f, 0, -0.3f), // last row
 
         // Last layer
-        glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0, -0.5f, 0.5f), glm::vec3(0.5f, -0.5f, 0.5f), //front row
-        glm::vec3(-0.5f, -0.5f, 0), glm::vec3(0, -0.5f, 0), glm::vec3(0.5f, -0.5f, 0), // middle row
-        glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0, -0.5f, -0.5f), glm::vec3(0.5f, -0.5f, -0.5f) // last row
+        glm::vec3(-0.3f, -0.3f, 0.3f), glm::vec3(0, -0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), //front row
+        glm::vec3(-0.3f, -0.3f, 0), glm::vec3(0, -0.3f, 0), glm::vec3(0.3f, -0.3f, 0), // middle row
+        glm::vec3(-0.3f, -0.3f, -0.3f), glm::vec3(0, -0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f) // last row
     };
     glm::mat4 model_matrices[27];
     GLuint* textures;

@@ -15,7 +15,7 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-const unsigned int NUM_TEXTURES = 4;
+const unsigned int NUM_TEXTURES = 7;
 
 int main()
 {
@@ -60,7 +60,8 @@ int main()
 	shader.setMat4("perspective", perspective);
 	// load textures and configure magicCube
 	// -------------------------------------
-	std::string texPaths[NUM_TEXTURES] = {"./images/black.png", "./images/green.png", "./images/orange.png", "./images/skyblue.png"};
+	std::string texPaths[NUM_TEXTURES] = {"./images/black.png",   "./images/green.png",  "./images/orange.png", "./images/red.png", 
+										  "./images/skyblue.png", "./images/yellow.png", "./images/white.png" };
 	MagicCube magicCube;
 	magicCube.loadTextures(NUM_TEXTURES, texPaths);
 	// --------------
@@ -78,8 +79,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		magicCube.rotate(glm::vec3(0, 1.0f, 0), glm::radians(0.1f));
-		magicCube.rotateUpperLayerY(glm::radians(0.1f));
+		magicCube.rotate(glm::vec3(0, 1.0f, 0), glm::radians(0.3f));
+		//magicCube.rotateUpperLayerY(glm::radians(0.3f));
 		magicCube.draw(shader);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
