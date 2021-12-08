@@ -103,9 +103,9 @@ public:
      * 
      * @param shader: shader program used to render the magic cube
      */
-    void draw(const Shader& shader){
+    void draw(const Shader& shader, const glm::mat4& model){
         for(int ix = 0; ix != 27; ++ix){
-            shader.setMat4("model", model_matrices[ix]);
+            shader.setMat4("model", model * model_matrices[ix]);
             cubes[ix].draw(textures);
         }
     }
@@ -114,24 +114,24 @@ public:
      * Rotate the magic cube as a whole
      *
      * @param axis: rotation axis
-     * @param angle: rotation angle, expressed in radians
+     * @param angle: rotation angle, expressed in degrees
      */
     void rotate(glm::vec3 axis, const float angle){
         axis = glm::normalize(axis);
         for(int ix = 0; ix != 27; ++ix){
-            model_matrices[ix] = glm::rotate(glm::mat4(1.0f), angle, axis) * model_matrices[ix];
+            model_matrices[ix] = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis) * model_matrices[ix];
         }
     }
 
     /*
      * Rotate the upper layer of the magic cube for a given angle
      *
-     * @param angle: rotation angle, expressed in radians
+     * @param angle: rotation angle, expressed in degrees
      */
     void rotateUpperLayerY(const float angle){
         glm::vec3 axis(0, 1.0f, 0);
         glm::vec4 tmpPos;
-        glm::mat4 rotate_matrix = glm::rotate(glm::mat4(1.0f), angle, axis);
+        glm::mat4 rotate_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis);
 
         for(int ix = 0; ix != 27; ++ix){
             tmpPos = model_matrices[ix] * glm::vec4(cubePositions[ix], 1.0f);
