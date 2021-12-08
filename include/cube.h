@@ -65,6 +65,10 @@ public:
         model = model_;
     }
 
+    glm::vec3 getCenter() const {
+        return glm::vec3(model * glm::vec4(0, 0, 0, 1.0f));
+    }
+
     void rotate(glm::vec3 axis, const float angle){
         axis = glm::normalize(axis);
         model = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis) * model;
@@ -104,11 +108,14 @@ public:
     bool hit(const Ray& ray, double t_min, double t_max, HitRecord& rec){
         bool ishit = false;
         float dn, t;
-        glm::vec3 hit_point;
+        glm::vec3 hit_point, norm;
 
         for(int ix = 0; ix != 6; ++ix){
-            Triangle tri(vertices[6*ix].first, vertices[6*ix+1].first, vertices[6*ix+2].first);
-            glm::vec3 norm = glm::cross(tri.y-tri.x, tri.z-tri.x);
+            Triangle tri(vertices[6*ix].first, 
+                         vertices[6*ix+1].first, 
+                         vertices[6*ix+2].first);
+            tri.transform(model);
+            norm = glm::normalize(glm::cross(tri.y-tri.x, tri.z-tri.x));
             dn = glm::dot(ray.direction, norm);
             if(fabs(dn) < 1e-5) continue;
             t = glm::dot((tri.x - ray.origin), norm) / dn;
@@ -116,6 +123,7 @@ public:
             hit_point = ray.at(t);
             if(!tri.inside(hit_point)){
                 tri = Triangle(vertices[6*ix+3].first, vertices[6*ix+4].first, vertices[6*ix+5].first);
+                tri.transform(model);
                 if(!tri.inside(hit_point)) continue;
             }
             ishit = true;
@@ -129,7 +137,7 @@ public:
 
 private:
     vector<pair<glm::vec3, glm::vec2>> vertices = {
-	     /* vertices          texture */
+	     /* vertices              texture */
 	  	 // Back face
         {{-0.5f, -0.5f, -0.5f},  {0.0f, 0.0f}},
         {{ 0.5f, -0.5f, -0.5f},  {1.0f, 0.0f}},

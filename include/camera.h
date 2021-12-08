@@ -1,6 +1,7 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,14 +17,9 @@ public:
     // ------------
     Camera(): position(glm::vec3(0, 0, 3.0f)) { updateCameraCoordinates(); }
 
-    Camera(glm::vec3 pos): position(pos) { updateCameraCoordinates(); }
-
-    Camera(float x_pos, float y_pos, float z_pos){
-        position.x = x_pos;
-        position.y = y_pos;
-        position.z = z_pos;
-
-        updateCameraCoordinates();
+    Camera(glm::vec3 pos, float aspect_ratio): 
+        position(pos), aspect_ratio(aspect_ratio), target(glm::vec3(0)) { 
+        updateCameraCoordinates(); 
     }
 
     // getters
@@ -44,9 +40,22 @@ public:
         glm::mat4 ret = glm::transpose(rotation) * translation;
         return ret;
     }
+
+    glm::mat4 getPerspective() {
+        return glm::perspective(glm::radians(fov), aspect_ratio, znear, zfar);
+    }
+
+    glm::vec3 at(float u, float v){
+        return lower_left_corner + u * horizontal + v * vertical;
+    }
+
     // get Field of View
     GLfloat getFoV() const {
         return fov;
+    }
+
+    glm::vec3 getPosition() const {
+        return position;
     }
 
     // Event Processors
@@ -70,41 +79,42 @@ public:
         }
     }
 
-    void onDirectionChange(float yaw_offset, float pitch_offset) {
-        yaw -= yaw_offset;
-        pitch -= pitch_offset;
-        if(pitch > 89.0f) pitch = 89.0f;
-        if(pitch < -89.0f) pitch = -89.0f;
+    void onZooming(float offset) {
+        fov -= offset;
+        if(fov > 75.0f) fov = 75.0f;
+        if(fov < 10.0f)  fov = 10.0f;
         updateCameraCoordinates();
     }
 
-    void onZooming(float offset) {
-        fov -= offset;
-        if(fov > 45.0f) fov = 45.0f;
-        if(fov < 1.0f)  fov = 1.0f;
-    }
-
 private:
-    // euler angles
-    float pitch = 0;
-    float yaw = 180.0f;
-    // field of view
+    // perspective settings
     float fov = 45.0f;
+    float znear = 0.1f;
+    float zfar = 100.0f;
+    float aspect_ratio;
     // camera attributes
     glm::vec3 position;
+    glm::vec3 target;
     glm::vec3 front;
     glm::vec3 right;
     glm::vec3 worldUp = glm::vec3(0, 1.0f, 0);
     glm::vec3 up;
+    glm::vec3 horizontal;
+    glm::vec3 vertical;
+    glm::vec3 lower_left_corner;
 
     void updateCameraCoordinates(){
         glm::vec3 direction;
-        direction.x = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-        direction.y = sin(glm::radians(pitch));
-        direction.z = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+        direction = target - position;
         front = glm::normalize(direction);
         right = glm::normalize(glm::cross(worldUp, front));
         up    = glm::normalize(glm::cross(front, right));
+
+        float camera_height = 2.0 * znear * std::tan(glm::radians(fov / 2));
+        float camera_width = camera_height * aspect_ratio;
+        horizontal = glm::vec3(-camera_width) * right;
+        vertical = glm::vec3(camera_height) * up;
+        lower_left_corner = position + glm::vec3(znear)*front - glm::vec3(0.5f)*horizontal - glm::vec3(0.5f)*vertical;
     }
 };
 #endif

@@ -1,7 +1,12 @@
 #ifndef TRIANGLE_H_
 #define TRIANGLE_H_
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 struct HitRecord{
+    int ix;
     float t;
     glm::vec3 p;
 };
@@ -27,6 +32,12 @@ public:
         bool has_neg = (s1 < 0 || s2 < 0 || s3 < 0);
         bool has_pos = (s1 > 0 || s2 > 0 || s3 > 0);
         return !(has_neg && has_pos);
+    }
+
+    void transform(const glm::mat4 &model){
+        x = glm::vec3(model * glm::vec4(x, 1.0f));
+        y = glm::vec3(model * glm::vec4(y, 1.0f));
+        z = glm::vec3(model * glm::vec4(z, 1.0f));
     }
 };
 

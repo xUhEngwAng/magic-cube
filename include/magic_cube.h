@@ -10,6 +10,10 @@
 
 #include "cube.h"
 
+enum RotateState {ROTATE_X, ROTATE_Y, ROTATE_Z, ROTATE_NONE};
+enum RotateMode  {ROTATE_GLOBAL, ROTATE_LOCAL};
+enum RotateLayer {LAYER_ONE, LAYER_TWO, LAYER_THREE, LAYER_ALL};
+
 class MagicCube {
 public:
     /*
@@ -62,7 +66,7 @@ public:
         glm::mat4 model;
         for(int ix = 0; ix != 27; ++ix){
             model = glm::translate(glm::mat4(1.0f), cubePositions[ix]);
-            model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+            model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
             cubes[ix].setModel(model);
         }
     }
@@ -105,9 +109,15 @@ public:
      * 
      * @param shader: shader program used to render the magic cube
      */
-    void draw(const Shader& shader, const glm::mat4& tmp_model){
+    void draw(const Shader& shader, RotateState state, RotateLayer layer, float angle){
+        glm::vec3 axis;
+        if(state == ROTATE_X) axis = glm::vec3(1.0f, 0, 0);
+        if(state == ROTATE_Y) axis = glm::vec3(0, 1.0f, 0);
+        if(state == ROTATE_Z) axis = glm::vec3(0, 0, 1.0f);
+        glm::mat4 model = glm::rotate(glm::mat4(1.0f), angle, axis);
+
         for(int ix = 0; ix != 27; ++ix){
-            cubes[ix].draw(shader, textures, tmp_model);
+            //cubes[ix].draw(shader, textures, tmp_model);
         }
     }
 
@@ -120,6 +130,30 @@ public:
     void rotate(glm::vec3 axis, const float angle){
         for(int ix = 0; ix != 27; ++ix){
             cubes[ix].rotate(axis, angle);
+        }
+    }
+
+    void rotateX(const glm::vec3& hit_point, const float angle){
+        for(int ix = 0; ix != 27; ++ix){
+            glm::vec3 tmp = cubes[ix].getCenter();
+            if(fabs(tmp.x - hit_point.x) < 0.15)
+                cubes[ix].rotate(glm::vec3(1.0f, 0, 0), angle);
+        }
+    }
+
+    void rotateY(const glm::vec3& hit_point, const float angle){
+        for(int ix = 0; ix != 27; ++ix){
+            glm::vec3 tmp = cubes[ix].getCenter();
+            if(fabs(tmp.y - hit_point.y) < 0.15)
+                cubes[ix].rotate(glm::vec3(0, 1.0f, 0), angle);
+        }
+    }
+
+    void rotateZ(const glm::vec3& hit_point, const float angle){
+        for(int ix = 0; ix != 27; ++ix){
+            glm::vec3 tmp = cubes[ix].getCenter();
+            if(fabs(tmp.z - hit_point.z) < 0.15)
+                cubes[ix].rotate(glm::vec3(0, 0, 1.0f), angle);
         }
     }
 
@@ -139,6 +173,24 @@ public:
     //         model_matrices[ix] = rotate_matrix * model_matrices[ix];
     //     }
     // }
+
+    bool hit(const Ray& ray, double t_min, double t_max, HitRecord& rec){
+        bool ishit = false;
+        for(int ix = 0; ix != 27; ++ix){
+            if(cubes[ix].hit(ray, t_min, t_max, rec)){
+                t_max = rec.t;
+                ishit = true;
+                rec.ix = ix;
+            }
+        }
+        if(!ishit){
+            std::cout << "not hit" << std::endl;
+            return false;
+        }
+        glm::vec3 hit_point = rec.p;
+        std::cout << "hit_point: " << hit_point.x << ' ' << hit_point.y << ' ' << hit_point.z << std::endl;
+        return true;
+    }
 
 private:
     Cube cubes[27];
