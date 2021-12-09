@@ -84,14 +84,17 @@ public:
 
         FaceTexture currTex;
         glm::mat4 tmp_model;
+        glm::mat3 normModel;
         tmp_model = glm::translate(glm::mat4(1.0f), center);
         tmp_model = glm::rotate(tmp_model, glm::radians(angle), axis);
         tmp_model = glm::translate(tmp_model, -center);
+        normModel = glm::mat3(glm::transpose(glm::inverse(tmp_model * model)));
 
         for(int ix = 0; ix != 6; ++ix){
             currTex = face_textures[ix];
 			glBindTexture(GL_TEXTURE_2D, textures[currTex]);
             shader.setMat4("model", tmp_model * model);
+            shader.setMat3("normModel", normModel);
 			glDrawArrays(GL_TRIANGLES, ix * 6, 6);
 		}
 
@@ -188,6 +191,50 @@ private:
         {{-0.5f,  0.5f,  0.5f},  {0.0f, 0.0f}},
         {{-0.5f,  0.5f, -0.5f},  {0.0f, 1.0f}}
     };
+    GLfloat norms[108] = {
+		0.0f,  0.0f, -1.0f,
+		0.0f,  0.0f, -1.0f, 
+		0.0f,  0.0f, -1.0f, 
+		0.0f,  0.0f, -1.0f, 
+		0.0f,  0.0f, -1.0f, 
+		0.0f,  0.0f, -1.0f, 
+
+		0.0f,  0.0f, 1.0f,
+		0.0f,  0.0f, 1.0f,
+		0.0f,  0.0f, 1.0f,
+		0.0f,  0.0f, 1.0f,
+		0.0f,  0.0f, 1.0f,
+		0.0f,  0.0f, 1.0f,
+
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+		1.0f,  0.0f,  0.0f,
+
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+	 	0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+		0.0f, -1.0f,  0.0f,
+
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,
+		0.0f,  1.0f,  0.0f
+	};
+
     FaceTexture face_textures[6];
     GLuint VAO, VBO;
     glm::mat4 model;
@@ -202,10 +249,15 @@ private:
 
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size()*5*sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 36*5*sizeof(GLfloat)+sizeof(norms), NULL, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, 36*5*sizeof(GLfloat), &vertices[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 36*5*sizeof(GLfloat), sizeof(norms), norms);
+        
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)(36*5*sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
 
         glBindVertexArray(0);
