@@ -114,15 +114,30 @@ public:
         if(state == ROTATE_X) axis = glm::vec3(1.0f, 0, 0);
         if(state == ROTATE_Y) axis = glm::vec3(0, 1.0f, 0);
         if(state == ROTATE_Z) axis = glm::vec3(0, 0, 1.0f);
-        glm::mat4 model = glm::rotate(glm::mat4(1.0f), angle, axis);
+        glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis);
 
         for(int ix = 0; ix != 27; ++ix){
-            //cubes[ix].draw(shader, textures, tmp_model);
-            if(cube_qualified(ix, state, layer)){
+            if(cube_qualified(ix, state, layer))
                 cubes[ix].draw(shader, textures, model);
-            }
-            else{
+            else
                 cubes[ix].draw(shader, textures, glm::mat4(1.0f));
+        }
+    }
+    
+    /*
+     * Rotate the magic cube as a whole
+     *
+     * @param axis: rotation axis
+     * @param angle: rotation angle, expressed in degrees
+     */
+    void rotate(RotateState state, RotateLayer layer, float angle){
+        glm::vec3 axis;
+        if(state == ROTATE_X) axis = glm::vec3(1.0f, 0, 0);
+        if(state == ROTATE_Y) axis = glm::vec3(0, 1.0f, 0);
+        if(state == ROTATE_Z) axis = glm::vec3(0, 0, 1.0f);
+        for(int ix = 0; ix != 27; ++ix){
+            if(cube_qualified(ix, state, layer)){
+                cubes[ix].rotate(axis, angle);
             }
         }
     }
@@ -153,18 +168,6 @@ public:
         return qualified;
     }
 
-    /*
-     * Rotate the magic cube as a whole
-     *
-     * @param axis: rotation axis
-     * @param angle: rotation angle, expressed in degrees
-     */
-    void rotate(glm::vec3 axis, const float angle){
-        for(int ix = 0; ix != 27; ++ix){
-            cubes[ix].rotate(axis, angle);
-        }
-    }
-
     void rotateX(const glm::vec3& hit_point, const float angle){
         for(int ix = 0; ix != 27; ++ix){
             glm::vec3 tmp = cubes[ix].getCenter();
@@ -188,23 +191,6 @@ public:
                 cubes[ix].rotate(glm::vec3(0, 0, 1.0f), angle);
         }
     }
-
-    /*
-     * Rotate the upper layer of the magic cube for a given angle
-     *
-     * @param angle: rotation angle, expressed in degrees
-     */
-    // void rotateUpperLayerY(const float angle){
-    //     glm::vec3 axis(0, 1.0f, 0);
-    //     glm::vec4 tmpPos;
-    //     glm::mat4 rotate_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis);
-
-    //     for(int ix = 0; ix != 27; ++ix){
-    //         tmpPos = model_matrices[ix] * glm::vec4(cubePositions[ix], 1.0f);
-    //         if(tmpPos.y < 0.49) continue;
-    //         model_matrices[ix] = rotate_matrix * model_matrices[ix];
-    //     }
-    // }
 
     bool hit(const Ray& ray, double t_min, double t_max, HitRecord& rec){
         bool ishit = false;

@@ -165,6 +165,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 				if(rotate_angle < 0) num_rotates -= 1;
 				else num_rotates += 1;
 			}
+			magicCube.rotate(rotate_state, rotate_layer, num_rotates * 90.0f);
 			rotate_angle = 0;
 			rotate_state = ROTATE_NONE;
 		}
@@ -172,7 +173,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 void global_rotate(glm::vec2 mouse_offset){
-	const double velocity = 50.0;
+	const double velocity = 400.0;
 	float xoffset = glm::dot(scr_axis[0], mouse_offset);
 	float yoffset = glm::dot(scr_axis[1], mouse_offset);
 	float zoffset = glm::dot(scr_axis[2], mouse_offset);
@@ -204,7 +205,7 @@ void global_rotate(glm::vec2 mouse_offset){
 }
 
 void local_rotate(glm::vec2 mouse_offset, const HitRecord& rec){
-	const double velocity = 50.0;
+	const double velocity = 400.0;
 	glm::vec3 hit_point = rec.p;
 	float xoffset = 0, yoffset = 0, zoffset = 0;
 	if(fabs(hit_point.x - 0.45) < 1e-5){ // Hit right face 
