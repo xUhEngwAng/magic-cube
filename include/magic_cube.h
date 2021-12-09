@@ -66,7 +66,7 @@ public:
         glm::mat4 model;
         for(int ix = 0; ix != 27; ++ix){
             model = glm::translate(glm::mat4(1.0f), cubePositions[ix]);
-            model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
+            model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
             cubes[ix].setModel(model);
         }
     }
@@ -86,7 +86,7 @@ public:
             // glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, textures[ix]);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -118,7 +118,39 @@ public:
 
         for(int ix = 0; ix != 27; ++ix){
             //cubes[ix].draw(shader, textures, tmp_model);
+            if(cube_qualified(ix, state, layer)){
+                cubes[ix].draw(shader, textures, model);
+            }
+            else{
+                cubes[ix].draw(shader, textures, glm::mat4(1.0f));
+            }
         }
+    }
+
+    bool cube_qualified(int cube_ix, const RotateState state, const RotateLayer layer){
+        if(state == ROTATE_NONE) return false;
+        if(layer == LAYER_ALL) return true;
+
+        float layer_center;
+        if(layer == LAYER_ONE) layer_center = -0.3f;
+        else if(layer == LAYER_TWO) layer_center = 0;
+        else layer_center = 0.3f;
+
+        bool qualified;
+        switch(state){
+            case ROTATE_X:
+                qualified = fabs(cubes[cube_ix].getCenter().x - layer_center) < 1e-5f;
+            break;
+            case ROTATE_Y:
+                qualified = fabs(cubes[cube_ix].getCenter().y - layer_center) < 1e-5f;
+            break;
+            case ROTATE_Z:
+                qualified = fabs(cubes[cube_ix].getCenter().z - layer_center) < 1e-5f;
+            break;
+            default:
+            break;
+        }
+        return qualified;
     }
 
     /*
@@ -184,11 +216,9 @@ public:
             }
         }
         if(!ishit){
-            std::cout << "not hit" << std::endl;
             return false;
         }
         glm::vec3 hit_point = rec.p;
-        std::cout << "hit_point: " << hit_point.x << ' ' << hit_point.y << ' ' << hit_point.z << std::endl;
         return true;
     }
 

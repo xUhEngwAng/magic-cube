@@ -58,6 +58,11 @@ public:
         return position;
     }
 
+    void setAspectRatio(float aspect_ratio_) {
+        aspect_ratio = aspect_ratio_;
+        updateCameraCoordinates();
+    }
+
     // Event Processors
     // ----------------
     void onPositionChange(Direction dir, float offset){
