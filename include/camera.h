@@ -17,8 +17,8 @@ public:
     // ------------
     Camera(): position(glm::vec3(0, 0, 3.0f)) { updateCameraCoordinates(); }
 
-    Camera(glm::vec3 pos, float aspect_ratio): 
-        position(pos), aspect_ratio(aspect_ratio), target(glm::vec3(0)) { 
+    Camera(glm::vec3 pos, glm::vec3 target, float aspect_ratio): 
+        position(pos), target(target), aspect_ratio(aspect_ratio) { 
         updateCameraCoordinates(); 
     }
 

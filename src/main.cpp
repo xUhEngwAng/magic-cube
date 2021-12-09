@@ -21,9 +21,9 @@ unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
 const unsigned int NUM_TEXTURES = 7;
 
-Camera cam(glm::vec3(2.0f, 2.0f, 2.0f), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT);
+Camera cam(glm::vec3(2.6f, 2.6f, 2.0f), glm::vec3(0.6f, 0.6f, -0.6f), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT);
 HitRecord rec;
-MagicCube magicCube;
+MagicCube magicCube(3);
 
 const glm::vec2 scr_axis[3] = {glm::normalize(glm::vec2(-1.2f, 1.0f)),
 							   glm::vec2(1.0f, 0), 
@@ -122,8 +122,18 @@ int main()
 
 void processInput(GLFWwindow *window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if(glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		magicCube.setRank(2);
+	if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+		magicCube.setRank(3);
+	if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+		magicCube.setRank(4);
+	if(glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+		magicCube.setRank(5);
+	if(glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+		magicCube.setRank(6);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -208,64 +218,52 @@ void local_rotate(glm::vec2 mouse_offset, const HitRecord& rec){
 	const double velocity = 400.0;
 	glm::vec3 hit_point = rec.p;
 	float xoffset = 0, yoffset = 0, zoffset = 0;
-	if(fabs(hit_point.x - 0.45) < 1e-5){ // Hit right face 
+	if(fabs(hit_point.x - 1.2f) < 1e-5){ // Hit right face 
 		yoffset = glm::dot(glm::normalize(glm::vec2(1.5f, -1.0f)), mouse_offset);
 		zoffset = glm::dot(glm::normalize(glm::vec2(0, -1.0f)), mouse_offset);
 		if(rotate_state == ROTATE_NONE){
 			if(fabs(yoffset) > fabs(zoffset)){ 
 				// Rotate along y-axis
 				rotate_state = ROTATE_Y;
-				if(fabs(hit_point.y + 0.3f) < 0.15f) rotate_layer = LAYER_ONE;
-				if(fabs(hit_point.y) < 0.15f) rotate_layer = LAYER_TWO;
-				if(fabs(hit_point.y - 0.3f) < 0.15f) rotate_layer = LAYER_THREE;
+				rotate_layer = magicCube.getLayer(hit_point.y);
 			}
 			else{ 
 				// Rotate along z-axis
 				rotate_state = ROTATE_Z;
-				if(fabs(hit_point.z + 0.3f) < 0.15f) rotate_layer = LAYER_ONE;
-				if(fabs(hit_point.z) < 0.15f) rotate_layer = LAYER_TWO;
-				if(fabs(hit_point.z - 0.3f) < 0.15f) rotate_layer = LAYER_THREE;
+				rotate_layer = magicCube.getLayer(-hit_point.z);
 			}
 		}
 	}else
-	if(fabs(hit_point.y - 0.45) < 1e-5){ // Hit Upper face
+	if(fabs(hit_point.y - 1.2f) < 1e-5){ // Hit Upper face
 		xoffset = glm::dot(glm::normalize(glm::vec2(-1.5f, 1.0f)), mouse_offset);
 		zoffset = glm::dot(glm::normalize(glm::vec2(-1.5f, -1.0f)), mouse_offset);
 		if(rotate_state == ROTATE_NONE){
 			if(fabs(xoffset) > fabs(zoffset)){ 
 				// Rotate along x-axis
 				rotate_state = ROTATE_X;
-				if(fabs(hit_point.x + 0.3f) < 0.15f) rotate_layer = LAYER_ONE;
-				if(fabs(hit_point.x) < 0.15f) rotate_layer = LAYER_TWO;
-				if(fabs(hit_point.x - 0.3f) < 0.15f) rotate_layer = LAYER_THREE;
+				rotate_layer = magicCube.getLayer(hit_point.x);
 			}
 			else{ 
 				// Rotate along z-axis
 				rotate_state = ROTATE_Z;
-				if(fabs(hit_point.z + 0.3f) < 0.15f) rotate_layer = LAYER_ONE;
-				if(fabs(hit_point.z) < 0.15f) rotate_layer = LAYER_TWO;
-				if(fabs(hit_point.z - 0.3f) < 0.15f) rotate_layer = LAYER_THREE;
+				rotate_layer = magicCube.getLayer(-hit_point.z);
 			}
 		}
 	}
 	else
-	if(fabs(hit_point.z - 0.45) < 1e-5){ // Hit Front face
+	if(fabs(hit_point.z) < 1e-5){ // Hit Front face
 		xoffset = glm::dot(glm::normalize(glm::vec2(0, 1.0f)), mouse_offset);
 		yoffset = glm::dot(glm::normalize(glm::vec2(1.5f, 1.0f)), mouse_offset);
 		if(rotate_state == ROTATE_NONE){
 			if(fabs(xoffset) > fabs(yoffset)){ 
 				// Rotate along x-axis
 				rotate_state = ROTATE_X;
-				if(fabs(hit_point.x + 0.3f) < 0.15f) rotate_layer = LAYER_ONE;
-				if(fabs(hit_point.x) < 0.15f) rotate_layer = LAYER_TWO;
-				if(fabs(hit_point.x - 0.3f) < 0.15f) rotate_layer = LAYER_THREE;
+				rotate_layer = magicCube.getLayer(hit_point.x);
 			}
 			else{ 
 				// Rotate along y-axis
 				rotate_state = ROTATE_Y;
-				if(fabs(hit_point.y + 0.3f) < 0.15f) rotate_layer = LAYER_ONE;
-				if(fabs(hit_point.y) < 0.15f) rotate_layer = LAYER_TWO;
-				if(fabs(hit_point.y - 0.3f) < 0.15f) rotate_layer = LAYER_THREE;
+				rotate_layer = magicCube.getLayer(hit_point.y);
 			}
 		}
 	}

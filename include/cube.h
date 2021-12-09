@@ -12,6 +12,7 @@
 using std::vector;
 using std::pair;
 
+enum Face {FACE_BACK, FACE_FRONT, FACE_LEFT, FACE_RIGHT, FACE_BUTTOM, FACE_TOP};
 enum FaceTexture { FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_2, FACE_TEXTURE_3, FACE_TEXTURE_4, FACE_TEXTURE_5, FACE_TEXTURE_6 };
 
 class Cube {
@@ -36,12 +37,12 @@ public:
     Cube(FaceTexture back, FaceTexture front,
          FaceTexture left, FaceTexture right,
          FaceTexture bottom, FaceTexture top){
-            face_textures[0] = back;
-            face_textures[1] = front;
-            face_textures[2] = left;
-            face_textures[3] = right;
-            face_textures[4] = bottom;
-            face_textures[5] = top;
+            face_textures[FACE_BACK] = back;
+            face_textures[FACE_FRONT] = front;
+            face_textures[FACE_LEFT] = left;
+            face_textures[FACE_RIGHT] = right;
+            face_textures[FACE_BUTTOM] = bottom;
+            face_textures[FACE_TOP] = top;
     }
 
     /*
@@ -50,15 +51,8 @@ public:
      * 
      * @param back: texture index for back face
      */
-    void setFaceTexture(FaceTexture back, FaceTexture front,
-                        FaceTexture left, FaceTexture right,
-                        FaceTexture bottom, FaceTexture top){
-            face_textures[0] = back;
-            face_textures[1] = front;
-            face_textures[2] = left;
-            face_textures[3] = right;
-            face_textures[4] = bottom;
-            face_textures[5] = top;
+    void setFaceTexture(Face f, FaceTexture t){
+        face_textures[f] = t;
     }
 
     void setModel(const glm::mat4& model_){
@@ -69,9 +63,13 @@ public:
         return glm::vec3(model * glm::vec4(0, 0, 0, 1.0f));
     }
 
-    void rotate(glm::vec3 axis, const float angle){
-        axis = glm::normalize(axis);
-        model = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis) * model;
+    void rotate(glm::vec3 axis, glm::vec3 center, const float angle){
+        glm::mat4 tmp_model;
+        tmp_model = glm::translate(glm::mat4(1.0f), center);
+        tmp_model = glm::rotate(tmp_model, glm::radians(angle), axis);
+        tmp_model = glm::translate(tmp_model, -center);
+
+        model = tmp_model * model;
     }
     
     /*
@@ -80,11 +78,15 @@ public:
      * 
      * @param textures: textures handlers intialized and loaded.
      */
-    void draw(const Shader& shader, GLuint* textures, const glm::mat4& tmp_model){
+    void draw(const Shader& shader, GLuint* textures, glm::vec3 axis, glm::vec3 center, const float angle){
         if(first_draw) initDrawing();
         glBindVertexArray(VAO);
 
         FaceTexture currTex;
+        glm::mat4 tmp_model;
+        tmp_model = glm::translate(glm::mat4(1.0f), center);
+        tmp_model = glm::rotate(tmp_model, glm::radians(angle), axis);
+        tmp_model = glm::translate(tmp_model, -center);
 
         for(int ix = 0; ix != 6; ++ix){
             currTex = face_textures[ix];

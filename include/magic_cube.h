@@ -12,7 +12,7 @@
 
 enum RotateState {ROTATE_X, ROTATE_Y, ROTATE_Z, ROTATE_NONE};
 enum RotateMode  {ROTATE_GLOBAL, ROTATE_LOCAL};
-enum RotateLayer {LAYER_ONE, LAYER_TWO, LAYER_THREE, LAYER_ALL};
+enum RotateLayer {LAYER_ONE, LAYER_TWO, LAYER_THREE, LAYER_FOUR, LAYER_FIVE, LAYER_SIX, LAYER_ALL, LAYER_NONE};
 
 class MagicCube {
 public:
@@ -20,55 +20,41 @@ public:
      * MagicCube default constructor.
      * Intialize texture image & model matrix for each cube
      */
-    MagicCube() {
-        /* Initilize face textures of each cube */
+    MagicCube(): rank(3) { init(); }
+    MagicCube(int rank_): rank(rank_) { init(); }
+
+    void init(){
+        /* Initilize face textures & position of each cube */
         // ---------------------------------------
-        // First layer, front row
-        cubes[0].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        cubes[1].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        cubes[2].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        // First layer, middle row
-        cubes[3].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        cubes[4].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        cubes[5].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        // First layer, last row
-        cubes[6].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        cubes[7].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_6);
-        cubes[8].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_6);
-
-        // Second layer, front row
-        cubes[9].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        cubes[10].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        cubes[11].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        // Second layer, middle row
-        cubes[12].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        cubes[13].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        cubes[14].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        // Second layer, last row
-        cubes[15].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        cubes[16].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0);
-        cubes[17].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_0, FACE_TEXTURE_0);
-
-        // Last layer, front row
-        cubes[18].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        cubes[19].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        cubes[20].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_1, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        // Last layer, middle row
-        cubes[21].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        cubes[22].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        cubes[23].setFaceTexture(FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        // Lasty layer, last row
-        cubes[24].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_3, FACE_TEXTURE_0, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        cubes[25].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_5, FACE_TEXTURE_0);
-        cubes[26].setFaceTexture(FACE_TEXTURE_2, FACE_TEXTURE_0, FACE_TEXTURE_0, FACE_TEXTURE_4, FACE_TEXTURE_5, FACE_TEXTURE_0);
-
-        /* Initialize model matrices for each cube*/
         glm::mat4 model;
-        for(int ix = 0; ix != 27; ++ix){
-            model = glm::translate(glm::mat4(1.0f), cubePositions[ix]);
-            model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-            cubes[ix].setModel(model);
+        glm::vec3 curr_pos;
+        int curr_ix;
+        float cube_length = length / rank;
+        cubes = std::vector<Cube>(rank * rank * rank);
+
+        for(int layer = 0; layer != rank; ++layer){
+            for(int row = 0; row != rank; ++row){
+                for(int col = 0; col != rank; ++col){
+                    curr_pos = glm::vec3(col+0.5f, layer+0.5f, -row-0.5f) * glm::vec3(cube_length);                    
+                    model = glm::translate(glm::mat4(1.0f), curr_pos);
+                    model = glm::scale(model, glm::vec3(cube_length));
+                    curr_ix = rank * (layer * rank + row) + col;
+                    cubes[curr_ix].setModel(model);
+
+                    if(layer == 0) cubes[curr_ix].setFaceTexture(FACE_BUTTOM, FACE_TEXTURE_5);
+                    if(layer == rank-1) cubes[curr_ix].setFaceTexture(FACE_TOP, FACE_TEXTURE_6);
+                    if(row == 0) cubes[curr_ix].setFaceTexture(FACE_FRONT, FACE_TEXTURE_2);
+                    if(row == rank-1) cubes[curr_ix].setFaceTexture(FACE_BACK, FACE_TEXTURE_1);
+                    if(col == 0) cubes[curr_ix].setFaceTexture(FACE_LEFT, FACE_TEXTURE_3);
+                    if(col == rank-1) cubes[curr_ix].setFaceTexture(FACE_RIGHT, FACE_TEXTURE_4);
+                }
+            }
         }
+    }
+
+    void setRank(int rank_){
+        rank = rank_;
+        init();
     }
 
     /*
@@ -110,17 +96,28 @@ public:
      * @param shader: shader program used to render the magic cube
      */
     void draw(const Shader& shader, RotateState state, RotateLayer layer, float angle){
-        glm::vec3 axis;
-        if(state == ROTATE_X) axis = glm::vec3(1.0f, 0, 0);
-        if(state == ROTATE_Y) axis = glm::vec3(0, 1.0f, 0);
-        if(state == ROTATE_Z) axis = glm::vec3(0, 0, 1.0f);
-        glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis);
+        glm::vec3 axis = glm::vec3(1.0f, 0, 0);
+        glm::vec3 center;
+        glm::mat4 model;
 
-        for(int ix = 0; ix != 27; ++ix){
+        if(state == ROTATE_X){
+            axis = glm::vec3(1.0f, 0, 0);
+            center = glm::vec3(0, 0.5f, -0.5f) * glm::vec3(length);
+        }
+        if(state == ROTATE_Y){
+            axis = glm::vec3(0, 1.0f, 0);
+            center = glm::vec3(0.5f, 0, -0.5f) * glm::vec3(length);
+        }
+        if(state == ROTATE_Z){
+            axis = glm::vec3(0, 0, 1.0f);
+            center = glm::vec3(0.5f, 0.5f, 0) * glm::vec3(length);
+        }
+
+        for(int ix = 0; ix != cubes.size(); ++ix){
             if(cube_qualified(ix, state, layer))
-                cubes[ix].draw(shader, textures, model);
+                cubes[ix].draw(shader, textures, axis, center, angle);
             else
-                cubes[ix].draw(shader, textures, glm::mat4(1.0f));
+                cubes[ix].draw(shader, textures, axis, center, 0);
         }
     }
     
@@ -132,12 +129,24 @@ public:
      */
     void rotate(RotateState state, RotateLayer layer, float angle){
         glm::vec3 axis;
-        if(state == ROTATE_X) axis = glm::vec3(1.0f, 0, 0);
-        if(state == ROTATE_Y) axis = glm::vec3(0, 1.0f, 0);
-        if(state == ROTATE_Z) axis = glm::vec3(0, 0, 1.0f);
-        for(int ix = 0; ix != 27; ++ix){
+        glm::vec3 center;
+
+        if(state == ROTATE_X){
+            axis = glm::vec3(1.0f, 0, 0);
+            center = glm::vec3(0, 0.5f, -0.5f) * glm::vec3(length);
+        }
+        if(state == ROTATE_Y){
+            axis = glm::vec3(0, 1.0f, 0);
+            center = glm::vec3(0.5f, 0, -0.5f) * glm::vec3(length);
+        }
+        if(state == ROTATE_Z){
+            axis = glm::vec3(0, 0, 1.0f);
+            center = glm::vec3(0.5f, 0.5f, 0) * glm::vec3(length);
+        }
+
+        for(int ix = 0; ix != cubes.size(); ++ix){
             if(cube_qualified(ix, state, layer)){
-                cubes[ix].rotate(axis, angle);
+                cubes[ix].rotate(axis, center, angle);
             }
         }
     }
@@ -146,10 +155,8 @@ public:
         if(state == ROTATE_NONE) return false;
         if(layer == LAYER_ALL) return true;
 
-        float layer_center;
-        if(layer == LAYER_ONE) layer_center = -0.3f;
-        else if(layer == LAYER_TWO) layer_center = 0;
-        else layer_center = 0.3f;
+        float cube_length = length / rank;
+        float layer_center = (0.5 + static_cast<int>(layer)) * cube_length;
 
         bool qualified;
         switch(state){
@@ -160,7 +167,7 @@ public:
                 qualified = fabs(cubes[cube_ix].getCenter().y - layer_center) < 1e-5f;
             break;
             case ROTATE_Z:
-                qualified = fabs(cubes[cube_ix].getCenter().z - layer_center) < 1e-5f;
+                qualified = fabs(cubes[cube_ix].getCenter().z + layer_center) < 1e-5f;
             break;
             default:
             break;
@@ -168,33 +175,24 @@ public:
         return qualified;
     }
 
-    void rotateX(const glm::vec3& hit_point, const float angle){
-        for(int ix = 0; ix != 27; ++ix){
-            glm::vec3 tmp = cubes[ix].getCenter();
-            if(fabs(tmp.x - hit_point.x) < 0.15)
-                cubes[ix].rotate(glm::vec3(1.0f, 0, 0), angle);
-        }
-    }
+    RotateLayer getLayer(float coord){
+        RotateLayer layer;
+        float cube_length = length / rank;
+        float center;
 
-    void rotateY(const glm::vec3& hit_point, const float angle){
-        for(int ix = 0; ix != 27; ++ix){
-            glm::vec3 tmp = cubes[ix].getCenter();
-            if(fabs(tmp.y - hit_point.y) < 0.15)
-                cubes[ix].rotate(glm::vec3(0, 1.0f, 0), angle);
+        for(int ix = 0; ix != rank; ++ix){
+            center = (ix + 0.5) * cube_length;
+            if(fabs(coord - center) < cube_length / 2){
+                return RotateLayer(ix);
+            }
         }
-    }
 
-    void rotateZ(const glm::vec3& hit_point, const float angle){
-        for(int ix = 0; ix != 27; ++ix){
-            glm::vec3 tmp = cubes[ix].getCenter();
-            if(fabs(tmp.z - hit_point.z) < 0.15)
-                cubes[ix].rotate(glm::vec3(0, 0, 1.0f), angle);
-        }
+        return LAYER_NONE;
     }
 
     bool hit(const Ray& ray, double t_min, double t_max, HitRecord& rec){
         bool ishit = false;
-        for(int ix = 0; ix != 27; ++ix){
+        for(int ix = 0; ix != cubes.size(); ++ix){
             if(cubes[ix].hit(ray, t_min, t_max, rec)){
                 t_max = rec.t;
                 ishit = true;
@@ -209,23 +207,9 @@ public:
     }
 
 private:
-    Cube cubes[27];
-    glm::vec3 cubePositions[27] = {
-        // First Layer
-        glm::vec3(-0.3f, 0.3f, 0.3f), glm::vec3(0, 0.3f, 0.3f), glm::vec3(0.3f, 0.3f, 0.3f), //front row
-        glm::vec3(-0.3f, 0.3f, 0), glm::vec3(0, 0.3f, 0), glm::vec3(0.3f, 0.3f, 0), // middle row
-        glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), // last row
-    
-        // Second layer
-        glm::vec3(-0.3f, 0, 0.3f), glm::vec3(0, 0, 0.3f), glm::vec3(0.3f, 0, 0.3f), //front row
-        glm::vec3(-0.3f, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0.3f, 0, 0), // middle row
-        glm::vec3(-0.3f, 0, -0.3f), glm::vec3(0, 0, -0.3f), glm::vec3(0.3f, 0, -0.3f), // last row
-
-        // Last layer
-        glm::vec3(-0.3f, -0.3f, 0.3f), glm::vec3(0, -0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), //front row
-        glm::vec3(-0.3f, -0.3f, 0), glm::vec3(0, -0.3f, 0), glm::vec3(0.3f, -0.3f, 0), // middle row
-        glm::vec3(-0.3f, -0.3f, -0.3f), glm::vec3(0, -0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f) // last row
-    };
+    int rank;
+    float length = 1.2;
+    std::vector<Cube> cubes;
     GLuint* textures;
 };
 
