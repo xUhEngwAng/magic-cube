@@ -176,8 +176,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 	glViewport(0, 0, width, height);
 	SCR_WIDTH = width;
 	SCR_HEIGHT = height;
-	float aspect_ratio = (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT;
-	cam.setAspectRatio(aspect_ratio);
+	if(SCR_HEIGHT != 0){
+		float aspect_ratio = (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT;
+		cam.setAspectRatio(aspect_ratio);
+	}
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
@@ -219,7 +221,7 @@ void global_rotate(glm::vec2 mouse_offset){
 	float yoffset = glm::dot(scr_axis[1], mouse_offset);
 	float zoffset = glm::dot(scr_axis[2], mouse_offset);
 	if(rotate_state == ROTATE_NONE){
-		if(fabs(xoffset) > fabs(yoffset)){
+		if(fabs(xoffset) >= fabs(yoffset)){
 			if(fabs(xoffset) > fabs(zoffset)) rotate_state = ROTATE_X;
 			else rotate_state = ROTATE_Z;
 		}
@@ -269,7 +271,7 @@ void local_rotate(glm::vec2 mouse_offset, const HitRecord& rec){
 		xoffset = glm::dot(glm::normalize(glm::vec2(-1.5f, 1.0f)), mouse_offset);
 		zoffset = glm::dot(glm::normalize(glm::vec2(-1.5f, -1.0f)), mouse_offset);
 		if(rotate_state == ROTATE_NONE){
-			if(fabs(xoffset) > fabs(zoffset)){ 
+			if(fabs(xoffset) >= fabs(zoffset)){ 
 				// Rotate along x-axis
 				rotate_state = ROTATE_X;
 				rotate_layer = magicCube.getLayer(hit_point.x);
