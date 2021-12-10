@@ -206,12 +206,12 @@ private:
 		0.0f,  0.0f, 1.0f,
 		0.0f,  0.0f, 1.0f,
 
-		1.0f,  0.0f,  0.0f,
-		1.0f,  0.0f,  0.0f,
-		1.0f,  0.0f,  0.0f,
-		1.0f,  0.0f,  0.0f,
-		1.0f,  0.0f,  0.0f,
-		1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
+		-1.0f,  0.0f,  0.0f,
 
 		1.0f,  0.0f,  0.0f,
 		1.0f,  0.0f,  0.0f,
@@ -258,7 +258,7 @@ private:
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)(36*5*sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
 
         glBindVertexArray(0);
         first_draw = false;

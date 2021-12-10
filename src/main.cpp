@@ -34,8 +34,13 @@ RotateLayer rotate_layer;
 
 double press_xpos, press_ypos;
 bool mouse_pressed;
-
 float rotate_angle = 0;
+
+// Lighting related
+enum LightMode {LIGHT_NONE, LIGHT_NORMAL, LIGHT_VARY};
+LightMode light_mode = LIGHT_NONE;
+glm::vec3 light_ambient;
+glm::vec3 light_diffuse;
 
 int main()
 {
@@ -79,11 +84,12 @@ int main()
 	// --------------------
 	Shader shader("./shader/vertex.glsl", "./shader/fragment.glsl");
 	shader.Use();
+	shader.setVec3("cameraPos", cam.getPosition());
+	shader.setVec3("lightPos", cam.getPosition());
 	// configure MVP matrices
 	// ----------------------
 	glm::mat4 view, perspective;
 	view = cam.getView();
-	GLfloat u, v;
 	shader.setMat4("view", view);
 	// --------------
 	glEnable(GL_DEPTH_TEST);
@@ -101,8 +107,25 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//magicCube.rotate(glm::vec3(0, 1.0f, 0), glm::radians(0.3f));
-		//magicCube.rotateUpperLayerY(glm::radians(0.3f));
+		switch(light_mode){
+			case LIGHT_NONE:
+			 	light_ambient = glm::vec3(1.0f);
+				light_diffuse = glm::vec3(0);
+				break;
+			case LIGHT_NORMAL:
+				light_ambient = glm::vec3(0.4f);
+				light_diffuse = glm::vec3(1.0f);
+				break;
+			case LIGHT_VARY:
+				light_diffuse.x = (sin(glfwGetTime() * 2.0f) + 1.0f) / 2;
+				light_diffuse.y = (sin(glfwGetTime() * 0.7f) + 1.0f) / 2;
+				light_diffuse.z = (sin(glfwGetTime() * 1.3f) + 1.0f) / 2;
+				light_ambient = light_diffuse * glm::vec3(0.4f);
+				break;
+		}
+		shader.setVec3("light_ambient", light_ambient);
+		shader.setVec3("light_diffuse", light_diffuse);
+
 		perspective = cam.getPerspective();
 		shader.setMat4("perspective", perspective);
 		
@@ -134,6 +157,14 @@ void processInput(GLFWwindow *window)
 		magicCube.setRank(5);
 	if(glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
 		magicCube.setRank(6);
+	
+	// change lighting mode
+	if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		light_mode = LIGHT_NONE;
+	if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		light_mode = LIGHT_NORMAL;
+	if(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+		light_mode = LIGHT_VARY;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

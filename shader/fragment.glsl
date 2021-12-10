@@ -2,27 +2,25 @@
 
 in vec2 texCoords;
 in vec3 fragNorm;
+in vec3 fragPos;
 
-out vec4 fragColor;
+out vec4 resultColor;
 
 uniform sampler2D texSampler;
-// uniform vec3 cameraPos;
-// uniform vec3 lightPos;
+uniform vec3 cameraPos;
+uniform vec3 lightPos;
+uniform vec3 light_ambient;
+uniform vec3 light_diffuse;
 
 void main(){
-    fragColor = texture(texSampler, texCoords);
+    vec3 fragColor = vec3(texture(texSampler, texCoords));
 
-    // vec3 ambient = vec3(0.1) * fragColor;
-    // // compute diffuse lighting
-    // vec3 norm = normalize(fragNorm);
-    // vec3 lightDir = normalize(lightPos - fragPos);
-    // vec3 diffuse = vec3(0.5) * color * max(0, dot(lightDir, norm));
-    // // compute specular lighting
-    // vec3 reflectDir = reflect(-lightDir, norm);
-    // vec3 cameraDir = normalize(cameraPos - fragPos);
-    // float spec = pow(max(0, dot(cameraDir, reflectDir)), 16);
-    // vec3 specular = vec3(1.0) * vec3(0.5) * spec;
+    vec3 ambient = light_ambient * fragColor;
+    // compute diffuse lighting
+    vec3 norm = normalize(fragNorm);
+    vec3 lightDir = normalize(lightPos - fragPos);
+    vec3 diffuse = light_diffuse * fragColor * max(0, dot(lightDir, norm));
 
-    // vec3  res = ambient + diffuse;
-    // resultColor = vec4(res, 1.0f);
+    vec3  res = ambient + diffuse;
+    resultColor = vec4(res, 1.0f);
 }
