@@ -1,10 +1,6 @@
 Magic Cube Project Report
 =========================
 
-汪绪恒 2020210931
-
-wxh20 at mails dot tsinghua dot edu dot cn
-
 ## Overview
 
 本项目实现了一个简单的魔方，支持用户：
